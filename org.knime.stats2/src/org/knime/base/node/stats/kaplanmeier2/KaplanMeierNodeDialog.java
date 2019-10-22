@@ -29,9 +29,8 @@ public class KaplanMeierNodeDialog extends DefaultNodeSettingsPane {
 
         KaplanMeierConfig cfg = new KaplanMeierConfig();
 
-        DialogComponentColumnNameSelection timeCol = new DialogComponentColumnNameSelection(
-                        cfg.getTimeCol(),
-                      "Time column", 0, true, false, DoubleValue.class, DateAndTimeValue.class);
+        DialogComponentColumnNameSelection timeCol = new DialogComponentColumnNameSelection(cfg.getTimeCol(),
+            "Time column", 0, true, false, KaplanMeierNodeModel.COLUMN_FILTER);
 
         DialogComponentColumnNameSelection eventCol = new DialogComponentColumnNameSelection(
             cfg.getEventCol(),

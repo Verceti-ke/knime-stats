@@ -23,6 +23,10 @@ import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
+import org.knime.core.data.time.localdate.LocalDateValue;
+import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
+import org.knime.core.data.time.localtime.LocalTimeValue;
+import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
@@ -34,6 +38,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
+import org.knime.core.node.util.DataValueColumnFilter;
 import org.knime.core.node.web.ValidationError;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.node.AbstractSVGWizardNodeModel;
@@ -50,6 +55,11 @@ public class KaplanMeierNodeModel
     private BufferedDataTable m_table;
 
     private KaplanMeierConfig m_config = new KaplanMeierConfig();
+
+    @SuppressWarnings("unchecked")
+    static final DataValueColumnFilter COLUMN_FILTER =
+        new DataValueColumnFilter(DoubleValue.class, DateAndTimeValue.class, LocalDateValue.class, LocalTimeValue.class,
+            LocalDateTimeValue.class, ZonedDateTimeValue.class);
 
     /**
      * Constructor for the node model.
@@ -233,10 +243,9 @@ public class KaplanMeierNodeModel
             throw new InvalidSettingsException("No time column selected.");
         }
         DataColumnSpec timeSpec = spec.getColumnSpec(timeIndex);
-        if (!timeSpec.getType().isCompatible(DateAndTimeValue.class)
-                && !timeSpec.getType().isCompatible(DoubleValue.class)) {
-            throw new InvalidSettingsException("Time column has the wrong "
-                                            + "data type (only double, int and datetime are allowed).");
+        if (!COLUMN_FILTER.includeColumn(timeSpec)) {
+            throw new InvalidSettingsException(
+                "Time column has the wrong data type (only double, int and datetime are allowed).");
         }
         if (spec.findColumnIndex(m_config.getEventCol().getStringValue()) == -1) {
             throw new InvalidSettingsException("No suitable event type column (boolean) selected.");
